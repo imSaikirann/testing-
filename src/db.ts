@@ -15,4 +15,3 @@ const pool = new Pool({ connectionString: databaseUrl });
 const adapter = new PrismaPg(pool);
 
 export const prismaClient = new PrismaClient({ adapter });
-

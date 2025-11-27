@@ -1,4 +1,3 @@
-
 import { prismaClient } from "../../db";
 
 export default async () => {
