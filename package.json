@@ -5,7 +5,9 @@
   "scripts": {
     "generate": "npx prisma generate",
     "test": "vitest",
-    "test:integration": " docker compose up -d && npx prisma migrate dev --name init && npm run test && docker compose down"
+    "test:integration": " docker compose up -d && npx prisma migrate dev --name init && npm run test && docker compose down",
+   
+    "dev":"tsc -b && node dist/index.js"
   },
   "keywords": [],
   "author": "",
