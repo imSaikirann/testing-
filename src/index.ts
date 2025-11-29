@@ -1,33 +1,29 @@
 import express from "express";
 import { prismaClient } from "./db";
 import { redis } from "./config/redis";
+import { requestQueue } from "./config/queue";
 
 export const app = express();
 
 app.use(express.json());
-
 app.post("/sum", async (req, res) => {
-    const a = req.body.a;
-    const b = req.body.b;
+  const a = req.body.a;
+  const b = req.body.b;
 
-    if (a > 1000000 || b > 1000000) {
-        return res.status(422).json({
-            message: "Sorry we dont support big numbers"
-        });
-    }
-
-    const result = a + b;
-
-    const request = await prismaClient.request.create({
-        data: { a, b, answer: result, type: "ADD" }
+  if (a > 1000000 || b > 1000000) {
+    return res.status(422).json({
+      message: "Sorry we dont support big numbers"
     });
+  }
 
-    // ❗ Important: Clear cache when new data added
-    await redis.del("requests_cache");
+  const result = a + b;
 
-    res.json({ answer: result, id: request.id });
+  // ➤ Push to queue instead of DB + cache work
+  const queue = await requestQueue.add("ADD", { a, b, answer: result }, { removeOnComplete:true});
+  console.log("Job added to queue:", queue.id);
+
+  res.json({ answer: result });
 });
-
 
 
 app.post("/mul", async (req, res) => {
@@ -59,10 +55,17 @@ app.get("/requests", async (req, res) => {
         const cached = await redis.get("requests_cache");
 
         if (cached) {
-            return res.json({ data: JSON.parse(cached), cached: true });
+            try {
+                const parsed = JSON.parse(cached);
+                return res.json({ data: parsed, cached: true });
+            } catch (parseError) {
+                // If cache contains invalid JSON, clear it and fetch from DB
+                console.warn("Invalid cache data, clearing cache:", parseError);
+                await redis.del("requests_cache");
+            }
         }
 
-        // 2️⃣ If not cached → fetch from DB
+        // 2️⃣ If not cached or cache invalid → fetch from DB
         const requests = await prismaClient.request.findMany({
         
         });

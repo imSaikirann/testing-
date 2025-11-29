@@ -6,8 +6,8 @@
     "generate": "npx prisma generate",
     "test": "vitest",
     "test:integration": " docker compose up -d && npx prisma migrate dev --name init && npm run test && docker compose down",
-   
-    "dev":"tsc -b && node dist/index.js"
+    "dev": "tsc -b && node dist/bin.js",
+    "start": "node dist/bin.js"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +17,7 @@
     "@prisma/adapter-pg": "^7.0.1",
     "@prisma/client": "^7.0.1",
     "@types/express": "^5.0.5",
+    "bullmq": "^5.65.0",
     "express": "^5.1.0",
     "pg": "^8.16.3",
     "prisma": "^7.0.1",
