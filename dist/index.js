@@ -29,7 +29,7 @@ exports.app.post("/sum", (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
     const result = a + b;
     // ➤ Push to queue instead of DB + cache work
-    const queue = yield queue_1.requestQueue.add("ADD", { a, b, answer: result });
+    const queue = yield queue_1.requestQueue.add("ADD", { a, b, answer: result }, { removeOnComplete: true });
     console.log("Job added to queue:", queue.id);
     res.json({ answer: result });
 }));
