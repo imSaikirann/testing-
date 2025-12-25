@@ -15,9 +15,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const autocannon_1 = __importDefault(require("autocannon"));
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     const instance = (0, autocannon_1.default)({
-        url: 'http://localhost:4000/api/v1/health',
-        connections: 40,
-        duration: 20,
+        url: "http://localhost:4000/api/v1",
+        method: "GET",
+        // 👇 EXACT CONTROL
+        amount: 100, // total requests
+        duration: 120, // 2 minutes
+        connections: 10, // keep low to avoid burst
     });
     // LIVE BENCHMARK OUTPUT
     autocannon_1.default.track(instance, {
@@ -27,12 +30,13 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
     // FINAL REPORT
     instance.then((result) => {
         console.log("\n-------- Final Report --------");
-        console.log(`Avg RPS       : ${result.requests.average}`);
-        console.log(`Max RPS       : ${result.requests.max}`);
-        console.log(`Errors        : ${result.errors}`);
-        console.log(`Timeouts      : ${result.timeouts}`);
-        console.log(`Latency (avg) : ${result.latency.average} ms`);
-        console.log(`Throughput    : ${(result.throughput.average / 1024).toFixed(2)} KB/s`);
+        console.log(`Total Requests : ${result.requests.total}`);
+        console.log(`Avg RPS        : ${result.requests.average}`);
+        console.log(`Max RPS        : ${result.requests.max}`);
+        console.log(`Errors         : ${result.errors}`);
+        console.log(`Timeouts       : ${result.timeouts}`);
+        console.log(`Latency (avg)  : ${result.latency.average} ms`);
+        console.log(`Throughput     : ${(result.throughput.average / 1024).toFixed(2)} KB/s`);
         console.log("------------------------------\n");
         process.exit(0);
     });
